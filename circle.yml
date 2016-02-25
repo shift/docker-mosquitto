@@ -1,0 +1,22 @@
+machine:
+  services:
+    - docker
+  pre:
+    - git config --global user.email "automation@tickli.sh"
+    - git config --global user.name "CircleCI"
+  ruby:
+    version: 2.2.0
+
+test:
+  override:
+    - mkdir -p $CIRCLE_TEST_REPORTS/cucumber
+    - sudo apt-get install nmap --yes
+    - sudo pip install https://github.com/nabla-c0d3/sslyze/archive/0.13.4.tar.gz
+    - docker info
+    - bundle exec rake
+
+deployment:
+  hub:
+    branch: master
+    commands:
+      - "curl -H \"Content-Type: application/json\" --data '{\"build\": true}' -X POST ${BUILD_HOOK}"
